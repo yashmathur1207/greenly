@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base target="_self">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planting Assistant</title>
+    <meta name="description" content="Gardening assistant app for beginners with plant identification and problem-solving features">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#4CAF50",
+                        secondary: "#8BC34A",
+                        accent: "#FF9800",
+                        dark: "#2E7D32"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Optional: Improves the appearance of the Google Translate widget */
+        .goog-te-gadget-simple {
+            background-color: #fff;
+            border-left: 1px solid #d1d1d1;
+            border-top: 1px solid #d1d1d1;
+            border-right: 1px solid #d1d1d1;
+            border-bottom: 1px solid #d1d1d1;
+            border-radius: 4px;
+            padding: 5px;
+        }
+        .goog-te-gadget-icon {
+            display: none;
+        }
+        body > .skiptranslate {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 font-sans">
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-primary text-white shadow-md">
+            <div class="container mx-auto px-4 py-4 relative flex items-center justify-between">
+                <!-- 1. LEFT SECTION: Login/Register/My Garden -->
+                <div class="w-1/3 flex justify-start items-center space-x-4">
+                    {% if current_user.is_authenticated %}
+                        <span class="text-sm font-semibold">Welcome, {{ current_user.username }}!</span>
+                        <a href="{{ url_for('my_garden') }}" class="text-sm font-semibold hover:text-secondary transition-colors">My Garden</a>
+                        <a href="{{ url_for('logout') }}" class="text-sm font-semibold bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="text-sm font-semibold bg-white text-primary px-3 py-1 rounded hover:bg-gray-200 transition-colors">Login</a>
+                        <a href="{{ url_for('register') }}" class="text-sm font-semibold hover:text-secondary transition-colors">Register</a>
+                    {% endif %}
+                </div>
+
+                <!-- 2. CENTER SECTION: Title -->
+                <div class="w-1/3 text-center">
+                    <a href="{{ url_for('index') }}"><h1 class="text-2xl font-bold">GREENLY</h1></a>
+                    <p class="text-sm opacity-90">Your guide to successful home gardening</p>
+                </div>
+
+                <!-- 3. RIGHT SECTION: Contact and Language -->
+                <div class="w-1/3 flex justify-end items-center space-x-4">
+                    <button id="contact-us-btn" class="hover:text-secondary transition-colors" title="Contact Us">
+                        <i class="fas fa-address-book text-2xl"></i>
+                    </button>
+                    <div id="google_translate_element"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- The Sliding Contact Us Menu -->
+        <div id="contact-drawer" class="fixed top-0 left-0 h-full w-80 bg-white shadow-lg z-50 transform -translate-x-full transition-transform duration-300 ease-in-out">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-primary">Contact Us</h2>
+                    <button id="close-drawer-btn" class="text-gray-500 hover:text-gray-800">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+                <ul class="space-y-4">
+                    <li class="border-b pb-3"><p class="font-semibold text-gray-800">Dr. Anjali Sharma</p><p class="text-sm text-gray-600">Lead Botanist</p><p class="text-sm text-primary font-medium mt-1">📞 +91 98765 43210</p></li>
+                    <li class="border-b pb-3"><p class="font-semibold text-gray-800">Rohan Mehta</p><p class="text-sm text-gray-600">Pest Control Specialist</p><p class="text-sm text-primary font-medium mt-1">📞 +91 87654 32109</p></li>
+                    <li class="border-b pb-3"><p class="font-semibold text-gray-800">Support Desk</p><p class="text-sm text-gray-600">General Inquiries</p><p class="text-sm text-primary font-medium mt-1">📞 +91 76543 21098</p></li>
+                </ul>
+            </div>
+        </div>
+        <div id="drawer-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+
+        <main class="flex-1 container mx-auto px-4 py-6">
+            <div id="selection-screen" class="space-y-6">
+                <div id="weather-widget" class="bg-white p-4 rounded-lg shadow-md mb-8 hidden">
+                    <div class="flex items-center justify-center space-x-4">
+                        <img id="weather-icon" src="" alt="Weather icon" class="w-16 h-16">
+                        <div>
+                            <p class="text-3xl font-bold text-gray-800"><span id="weather-temp">--</span>&deg;C</p>
+                            <p id="weather-desc" class="text-gray-600">Loading weather...</p>
+                            <p id="weather-location" class="text-sm text-gray-500"></p>
+                        </div>
+                    </div>
+                    <div id="weather-tip" class="mt-4 text-center text-primary bg-green-50 p-3 rounded-lg"></div>
+                </div>
+                <h2 class="text-xl font-semibold text-center text-gray-800 mb-8">What would you like to grow?</h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <button onclick="selectCategory('floral')" class="relative bg-secondary hover:scale-105 text-white py-12 rounded-lg shadow-md transition-all duration-300 overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1711859290042-5525337f8a22?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8ZGlmZmVyZW50JTIwZmxvd2VycyUyMGJyaWdodHxlbnwwfDB8MHx8fDA%3D');"></div><div class="absolute inset-0 bg-black bg-opacity-40"></div>
+                        <div class="relative text-center"><i class="fas fa-seedling text-4xl mb-2"></i><h3 class="text-xl font-bold">Ornamental Flora</h3><p class="text-sm opacity-90">Brighten your space with color, fragrance, and natural beauty</p></div>
+                    </button>
+                    <button onclick="selectCategory('edible')" class="relative bg-accent hover:scale-105 text-white py-12 rounded-lg shadow-md transition-all duration-300 overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://plus.unsplash.com/premium_photo-1702056255673-76c472a2c367?w=600&auto=format&fit=crop&q=60');"></div><div class="absolute inset-0 bg-black bg-opacity-40"></div>
+                        <div class="relative text-center"><i class="fas fa-carrot text-4xl mb-2"></i><h3 class="text-xl font-bold">Edible Plants</h3><p class="text-sm opacity-90">Elevate your diet with tasty and healthy greens</p></div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="category-screen" class="hidden">
+                <button onclick="goBackToSelection()" class="mb-4 text-primary hover:text-dark font-semibold"><i class="fas fa-arrow-left mr-2"></i>Back to Main Menu</button>
+                <div class="bg-white rounded-lg shadow-md p-4 mb-6"><div class="flex items-center space-x-3"><div class="flex-1 relative"><input type="text" id="search-input" placeholder="Search plants or problems..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"><i class="fas fa-search absolute right-3 top-3 text-gray-400"></i></div><button id="camera-button" class="bg-primary text-white p-3 rounded-lg hover:bg-dark transition-colors"><i class="fas fa-camera"></i></button><input type="file" id="image-upload" class="hidden" accept="image/*"></div></div>
+                <div id="plant-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <div id="plant-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50"><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg p-6 w-11/12 max-w-2xl max-h-[80vh] overflow-y-auto"><button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"><i class="fas fa-times"></i></button><div id="modal-content"></div></div></div>
+            <div id="prediction-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center"><div class="bg-white rounded-lg p-6 w-11/12 max-w-lg max-h-[90vh] overflow-y-auto relative"><button onclick="closePredictionModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"><i class="fas fa-times text-xl"></i></button><div id="prediction-content" class="text-center"><h2 class="text-2xl font-bold text-primary mb-4">Analysis Result</h2><div id="spinner" class="my-8 hidden"><img src="{{ url_for('static', filename='spinner.gif') }}" alt="Loading..." class="mx-auto w-16 h-16"><p class="text-gray-600 mt-2">Analyzing your plant...</p></div><div id="result-display" class="hidden"><img id="preview-image" src="#" alt="Image Preview" class="w-full h-64 object-contain rounded-lg mb-4"/><h3 id="prediction-text" class="text-xl font-semibold text-gray-800 capitalize-first"></h3><p id="solution-text" class="text-gray-700 mt-2 bg-gray-100 p-3 rounded-md"></p></div></div></div></div>
+            <div id="choice-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center"><div class="bg-white rounded-lg p-8 w-11/12 max-w-sm text-center"><h2 class="text-xl font-bold text-gray-800 mb-6">How would you like to add an image?</h2><div class="flex justify-around"><button id="upload-btn" class="bg-primary text-white py-3 px-6 rounded-lg hover:bg-dark transition-colors flex flex-col items-center space-y-2"><i class="fas fa-upload text-2xl"></i><span>Upload File</span></button><button id="camera-btn" class="bg-accent text-white py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors flex flex-col items-center space-y-2"><i class="fas fa-camera-retro text-2xl"></i><span>Use Camera</span></button></div><button onclick="document.getElementById('choice-modal').classList.add('hidden')" class="mt-6 text-gray-500 hover:text-gray-700">Cancel</button></div></div>
+            <div id="camera-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center"><div class="bg-white rounded-lg p-4 w-11/12 max-w-2xl text-center"><video id="video-stream" class="w-full rounded-lg" autoplay playsinline></video><canvas id="canvas" class="hidden"></canvas><div class="mt-4 flex justify-center space-x-4"><button id="capture-btn" class="bg-primary text-white py-3 px-8 rounded-lg hover:bg-dark transition-colors text-lg">Capture</button><button onclick="stopCamera()" class="bg-gray-300 text-gray-800 py-3 px-6 rounded-lg hover:bg-gray-400">Close</button></div></div></div>
+        </main>
+
+        <footer class="bg-gray-100 border-t mt-8"><div class="container mx-auto px-4 py-6"><p class="text-center text-sm text-gray-600"></p></div></footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const contactBtn = document.getElementById('contact-us-btn'); const closeDrawerBtn = document.getElementById('close-drawer-btn'); const drawer = document.getElementById('contact-drawer'); const overlay = document.getElementById('drawer-overlay'); function openDrawer() { drawer.classList.remove('-translate-x-full'); drawer.classList.add('translate-x-0'); overlay.classList.remove('hidden'); } function closeDrawer() { drawer.classList.remove('translate-x-0'); drawer.classList.add('-translate-x-full'); overlay.classList.add('hidden'); } contactBtn.addEventListener('click', openDrawer); closeDrawerBtn.addEventListener('click', closeDrawer); overlay.addEventListener('click', closeDrawer);
+        });
+    </script>
+    
+    <script>
+        let currentCategory = null;
+        let videoStream = null;
+        let plantData = null;
+        let userGardenIds = [];
+
+        function handleUrlQuery() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const plantId = urlParams.get('plant_id');
+
+            if (plantId && plantData) {
+                const numericPlantId = parseInt(plantId);
+                const allPlants = [...plantData.floral, ...plantData.edible];
+                const plantToShow = allPlants.find(p => p.id === numericPlantId);
+
+                if (plantToShow) {
+                    setTimeout(() => {
+                        showPlantDetails(plantToShow);
+                        // --- BUG FIX: Clean the URL after showing the modal to prevent re-opening on refresh ---
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    }, 100); 
+                }
+            }
+        }
+
+        async function fetchUserGarden() {
+            try {
+                const response = await fetch('/get-user-garden-ids');
+                if (response.ok) { userGardenIds = await response.json(); } 
+                else { userGardenIds = []; }
+            } catch (error) { console.error('Could not fetch user garden:', error); userGardenIds = []; }
+        }
+
+        async function fetchWeather() {
+            const apiKey = 'a5cd1b01e2ec92d5b29fd0de793dc464';
+            const weatherWidget = document.getElementById('weather-widget');
+            if (!navigator.geolocation) { weatherWidget.classList.add('hidden'); return; }
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+                try {
+                    const response = await fetch(apiUrl);
+                    if (!response.ok) throw new Error('Weather data not available.');
+                    const weatherData = await response.json();
+                    document.getElementById('weather-temp').textContent = Math.round(weatherData.main.temp);
+                    document.getElementById('weather-desc').textContent = weatherData.weather[0].description.replace(/\b\w/g, l => l.toUpperCase());
+                    document.getElementById('weather-location').textContent = weatherData.name;
+                    document.getElementById('weather-icon').src = `https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`;
+                    const temp = weatherData.main.temp;
+                    const mainWeather = weatherData.weather[0].main.toLowerCase();
+                    let tip = "Happy gardening today!";
+                    if (temp > 30) { tip = "It's hot today! Make sure to water your thirsty plants in the evening."; } 
+                    else if (mainWeather.includes('rain')) { tip = "It's raining! Your plants are getting a natural shower; you can skip watering today."; } 
+                    else if (temp < 15) { tip = "Cool weather. Protect any sensitive tropical plants from the chill."; }
+                    document.getElementById('weather-tip').textContent = tip;
+                    weatherWidget.classList.remove('hidden');
+                } catch (error) { console.error("Error fetching weather:", error); weatherWidget.classList.add('hidden'); }
+            }, () => { weatherWidget.classList.add('hidden'); });
+        }
+
+        function goBackToSelection() { document.getElementById('category-screen').classList.add('hidden'); document.getElementById('selection-screen').classList.remove('hidden'); currentCategory = null; }
+        function selectCategory(category) { document.getElementById('selection-screen').classList.add('hidden'); document.getElementById('category-screen').classList.remove('hidden'); currentCategory = category; loadPlants(category); }
+        function loadPlants(category) { const grid = document.getElementById('plant-grid'); grid.innerHTML = ''; if (!plantData) return; plantData[category].forEach(plant => { const plantCard = document.createElement('div'); plantCard.id = `plant-card-${plant.id}`; plantCard.className = 'bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-transform hover:scale-105'; plantCard.innerHTML = `<img src="${plant.image}" alt="${plant.name}" class="w-full h-48 object-cover" loading="lazy"><div class="p-4"><h3 class="font-semibold text-lg text-gray-800">${plant.name}</h3><p class="text-sm text-gray-600 mt-2">${plant.basics.substring(0, 60)}...</p></div>`; plantCard.onclick = () => showPlantDetails(plant); grid.appendChild(plantCard); }); }
+        
+        async function showPlantDetails(plant) {
+            const modalContent = document.getElementById('modal-content');
+            const isInGarden = userGardenIds.includes(plant.id);
+            const buttonText = isInGarden ? '✓ Added to Garden' : 'Add to My Garden';
+            const buttonClass = isInGarden ? 'bg-gray-400 cursor-not-allowed' : 'bg-accent hover:bg-orange-600';
+            const addToGardenButton = `
+                {% if current_user.is_authenticated %}
+                    <div class="mt-6 text-center">
+                        <button id="add-to-garden-btn" data-plant-id="${plant.id}" class="text-white font-bold py-2 px-6 rounded-lg transition-colors ${buttonClass}">
+                            ${buttonText}
+                        </button>
+                    </div>
+                {% endif %}
+            `;
+            modalContent.innerHTML = `<h2 class="text-2xl font-bold text-primary mb-4">${plant.name}</h2> <img src="${plant.image}" alt="${plant.name}" class="w-full h-64 object-cover rounded-lg mb-4" loading="lazy"> <div class="space-y-4"> <div> <h3 class="font-semibold text-lg">Basics</h3> <p class="text-gray-700">${plant.basics}</p> </div> <div> <h3 class="font-semibold text-lg">How to Grow</h3> <p class="text-gray-700">${plant.growing}</p> </div> <div class="grid grid-cols-2 gap-4"> <div> <h4 class="font-semibold">Germination Time</h4> <p>${plant.germination}</p> </div> <div> <h4 class="font-semibold">Temperature</h4> <p>${plant.temperature}</p> </div> </div> <div> <h3 class="font-semibold text-lg">Signs of Germination</h3> <p class="text-gray-700">${plant.germinationSigns}</p> </div> <div> <h3 class="font-semibold text-lg">Precautions</h3> <p class="text-gray-700">${plant.precautions}</p> </div> <div> <h3 class="font-semibold text-lg">Common Problems</h3> <div class="space-y-2 mt-2"> ${plant.problems.map(problem => ` <div class="bg-gray-50 p-3 rounded"> <strong class="text-red-600">${problem.symptom}:</strong> <p class="text-gray-700">${problem.solution}</p> </div> `).join('')} </div> </div> </div> ${addToGardenButton}`;
+            const btn = document.getElementById('add-to-garden-btn');
+            if (btn && !isInGarden) {
+                btn.addEventListener('click', handleAddToGarden);
+            }
+            document.getElementById('plant-modal').classList.remove('hidden');
+        }
+
+        async function handleAddToGarden(event) {
+            const button = event.target;
+            const plantId = parseInt(button.dataset.plantId);
+            try {
+                const response = await fetch('/add-to-garden', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plant_id: plantId })
+                });
+                const result = await response.json();
+                if (result.status === 'success' || result.status === 'ok') {
+                    button.textContent = '✓ Added to Garden';
+                    button.classList.remove('bg-accent', 'hover:bg-orange-600');
+                    button.classList.add('bg-gray-400', 'cursor-not-allowed');
+                    userGardenIds.push(plantId);
+                    button.removeEventListener('click', handleAddToGarden);
+                } else { alert(result.message || 'An error occurred.'); }
+            } catch (error) { console.error('Failed to add plant to garden:', error); alert('Could not add plant. Please try again.'); }
+        }
+
+        function closeModal() { document.getElementById('plant-modal').classList.add('hidden'); }
+        function closePredictionModal() { document.getElementById('prediction-modal').classList.add('hidden'); }
+        document.getElementById('plant-modal').onclick = function(e) { if (e.target.id === 'plant-modal') closeModal(); };
+        async function startCamera() { document.getElementById('camera-modal').classList.remove('hidden'); const video = document.getElementById('video-stream'); try { videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); video.srcObject = videoStream; } catch (err) { console.error("Error accessing camera: ", err); alert("Could not access the camera. Please ensure you have given permission."); stopCamera(); } }
+        function stopCamera() { if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); } document.getElementById('camera-modal').classList.add('hidden'); }
+        async function sendImageToServer(file) { const predictionModal = document.getElementById('prediction-modal'); const spinner = document.getElementById('spinner'); const resultDisplay = document.getElementById('result-display'); const previewImage = document.getElementById('preview-image'); const predictionText = document.getElementById('prediction-text'); const solutionText = document.getElementById('solution-text'); predictionModal.classList.remove('hidden'); spinner.classList.remove('hidden'); resultDisplay.classList.add('hidden'); previewImage.src = URL.createObjectURL(file); const formData = new FormData(); formData.append('image', file, 'capture.jpg'); try { const response = await fetch('/predict', { method: 'POST', body: formData }); if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error || 'Prediction failed on the server.'); } const data = await response.json(); predictionText.textContent = formatPredictionText(data.prediction); solutionText.textContent = data.solution; } catch (error) { console.error('Error:', error); predictionText.textContent = 'Prediction Failed'; solutionText.textContent = 'An error occurred. Please try again.'; } finally { spinner.classList.add('hidden'); resultDisplay.classList.remove('hidden'); } }
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchUserGarden();
+            fetchWeather();
+            try {
+                const response = await fetch('/static/data/data.json'); 
+                if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+                plantData = await response.json();
+                handleUrlQuery();
+            } catch (error) {
+                console.error('Error loading plant data:', error);
+                alert('Could not load plant data. Please check that data.json is in the static/data folder.');
+            }
+            const cameraButton = document.getElementById('camera-button'); const imageUpload = document.getElementById('image-upload'); const searchInput = document.getElementById('search-input'); const choiceModal = document.getElementById('choice-modal'); const uploadBtn = document.getElementById('upload-btn'); const cameraBtn = document.getElementById('camera-btn'); const captureBtn = document.getElementById('capture-btn');
+            cameraButton.addEventListener('click', () => { choiceModal.classList.remove('hidden'); });
+            uploadBtn.addEventListener('click', () => { choiceModal.classList.add('hidden'); imageUpload.click(); });
+            cameraBtn.addEventListener('click', () => { choiceModal.classList.add('hidden'); startCamera(); });
+            captureBtn.addEventListener('click', () => { const video = document.getElementById('video-stream'); const canvas = document.getElementById('canvas'); canvas.width = video.videoWidth; canvas.height = video.videoHeight; canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); stopCamera(); canvas.toBlob(blob => { const file = new File([blob], "capture.jpg", { type: "image/jpeg" }); sendImageToServer(file); }, 'image/jpeg'); });
+            imageUpload.addEventListener('change', (event) => { const file = event.target.files[0]; if (!file) return; sendImageToServer(file); imageUpload.value = ''; });
+            searchInput.addEventListener('keyup', () => { const searchTerm = searchInput.value.toLowerCase(); if (!currentCategory || !plantData) return; const plantsToSearch = plantData[currentCategory]; plantsToSearch.forEach(plant => { let searchableText = [ plant.name, plant.basics, plant.growing, plant.germination, plant.temperature, plant.precautions ].join(' ').toLowerCase(); plant.problems.forEach(problem => { searchableText += ` ${problem.symptom} ${problem.solution}`; }); const cardElement = document.getElementById(`plant-card-${plant.id}`); if (cardElement) { cardElement.style.display = searchableText.includes(searchTerm) ? '' : 'none'; } }); });
+        });
+    </script>
+
+    <!-- Google Translate Scripts -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({pageLanguage: 'en'}, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>
+

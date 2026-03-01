@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ plant.name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>{{ plant.name }}</h1>
+    <nav>
+      <a href="{{ url_for('plants_by_category', category='edible') }}">Edible Plants</a>
+      <a href="{{ url_for('plants_by_category', category='floral') }}">Floral Plants</a>
+      <a href="{{ url_for('index') }}">Home</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="plant-detail">
+      <img src="{{ url_for('static', filename=plant.image) }}" alt="{{ plant.name }}">
+      <div>
+        <h2>About</h2>
+        <p>{{ plant.description }}</p>
+        <h3>Care Tips</h3>
+        <p>{{ plant.care }}</p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+ <html lang="en">
+ <head>
+   <meta charset="UTF-8">
+   <title>{{ category.capitalize() }} Plants</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+ </head>
+ <body>
+   <header>
+     <h1>{{ category.capitalize() }} Plants</h1>
+     <nav>
+       <a href="/">Home</a>
+     </nav>
+   </header>
+
+   <main>
+     <div class="grid">
+       {% for plant in plants %}
+         <a href="/plant/{{ plant.name }}" class="plant-card">
+           <img src="{{ plant.image }}" alt="{{ plant.name }}">
+           <h3>{{ plant.name }}</h3>
+         </a>
+       {% endfor %}
+     </div>
+   </main>
+
+   <footer>
+     <p>© 2025 Plant Health Project</p>
+   </footer>
+ </body>
+ </html>

@@ -1,0 +1,12 @@
+.emoji{
+    position: fixed;
+    font-size: 1.5rem;
+    opacity:0.3;
+    animation: float 12s infinite linear;
+    z-index:0;
+}
+@keyframes float{
+    0%{transform:translateY(0) rotate(0deg);}
+    50%{transform:translateY(-20px) rotate(20deg);}
+    100%{transform:translateY(0) rotate(0deg);}
+}

@@ -1,0 +1,191 @@
+{
+  "floral": [
+    {
+      "id": 1,
+      "name": "Rose",
+      "image": "https://images.unsplash.com/photo-1594505270395-a47b48ffbc74?q=80&w=735&auto=format&fit=crop",
+      "basics": "Roses are perennial flowering plants known for their beautiful blooms and fragrance.",
+      "growing": "Plant in well-drained soil with 6-8 hours of sunlight daily. Water deeply but infrequently.",
+      "germination": "14-21 days",
+      "germinationSigns": "First true leaves appear, stem strengthens",
+      "temperature": "15-25°C (60-75°F)",
+      "precautions": "Prune regularly, watch for aphids, provide good air circulation",
+      "problems": [
+        {
+          "symptom": "Black spots on leaves",
+          "solution": "Apply fungicide, improve air circulation"
+        },
+        {
+          "symptom": "Yellowing leaves",
+          "solution": "Check watering schedule, may need fertilizer"
+        },
+        {
+          "symptom": "No blooms",
+          "solution": "Ensure adequate sunlight and proper pruning"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Hibiscus",
+      "image": "https://images.unsplash.com/photo-1567990989224-6441e1483ac8?w=600&auto=format&fit=crop&q=60",
+      "basics": "Tropical flowering plant with large, colorful blooms.",
+      "growing": "Prefers warm climates, well-drained acidic soil.",
+      "germination": "10-14 days",
+      "germinationSigns": "Seed leaves unfold, stem emerges",
+      "temperature": "20-30°C (68-86°F)",
+      "precautions": "Protect from frost, regular feeding during growing season",
+      "problems": [
+        {
+          "symptom": "Bud drop",
+          "solution": "Maintain consistent watering and temperature"
+        },
+        {
+          "symptom": "Leaf curl",
+          "solution": "Check for pests, ensure proper humidity"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Sunflower",
+      "image": "https://images.unsplash.com/photo-1442124920820-8e5f4b07b563?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjN8fHN1bmZsb3dlcnxlbnwwfHwwfHx8MA%3D%3D",
+      "basics": "Tall annual plants known for their large yellow blooms that follow the sun.",
+      "growing": "Requires full sun, well-drained soil, and regular watering.",
+      "germination": "7-10 days",
+      "germinationSigns": "Seedling emerges with sturdy stem and broad leaves",
+      "temperature": "18-30°C (65-85°F)",
+      "precautions": "Protect from strong winds, provide spacing for roots",
+      "problems": [
+        {
+          "symptom": "Drooping heads",
+          "solution": "May need staking or additional water"
+        },
+        {
+          "symptom": "Powdery mildew",
+          "solution": "Ensure air circulation, apply fungicide if needed"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Lotus",
+      "image": "https://images.unsplash.com/photo-1474557157379-8aa74a6ef541?w=600&auto=format&fit=crop&q=60",
+      "basics": "Aquatic plant with symbolic significance in many cultures.",
+      "growing": "Requires still water and full sunlight.",
+      "germination": "7-10 days",
+      "germinationSigns": "First floating leaves appear",
+      "temperature": "25-30°C (77-86°F)",
+      "precautions": "Keep water clean, protect from strong currents",
+      "problems": [
+        {
+          "symptom": "Yellow leaves",
+          "solution": "Check water quality, may need nutrients"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Marigold",
+      "image": "https://images.unsplash.com/photo-1606432144664-594a97fea6e2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fG1hcmlnb2xkfGVufDB8fDB8fHww",
+      "basics": "Hardy flowering plant popular for its bright orange and yellow blossoms.",
+      "growing": "Thrives in sunny locations with well-drained soil.",
+      "germination": "5-7 days",
+      "germinationSigns": "Seedlings with slender stems and small leaves",
+      "temperature": "20-30°C (68-86°F)",
+      "precautions": "Avoid overwatering, remove dead flowers to encourage blooms",
+      "problems": [
+        {
+          "symptom": "Yellowing leaves",
+          "solution": "Check soil drainage, avoid waterlogging"
+        },
+        {
+          "symptom": "Aphid infestation",
+          "solution": "Use insecticidal soap or neem oil"
+        }
+      ]
+    }
+  ],
+  "edible": [
+    {
+      "id": 4,
+      "name": "Tomato",
+      "image": "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzB8fHRvbWF0b3xlbnwwfHwwfHx8MA%3D%3D",
+      "basics": "Popular fruit vegetable easy to grow in home gardens.",
+      "growing": "Full sun, well-drained soil, support for vines.",
+      "germination": "5-10 days",
+      "germinationSigns": "First true leaves, sturdy stem",
+      "temperature": "18-24°C (65-75°F)",
+      "precautions": "Rotate crops, watch for blight",
+      "problems": [
+        {
+          "symptom": "Blossom end rot",
+          "solution": "Calcium deficiency, maintain consistent watering"
+        },
+        {
+          "symptom": "Leaf curl",
+          "solution": "Check for viruses or overwatering"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Capsicum",
+      "image": "https://images.unsplash.com/photo-1621953723422-6023013f659d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2Fwc2ljdW18ZW58MHx8MHx8fDA%3D",
+      "basics": "Bell peppers, a type of capsicum, are available in various colors and heat levels.",
+      "growing": "Warm weather plant, needs consistent moisture.",
+      "germination": "10-21 days",
+      "germinationSigns": "First set of true leaves",
+      "temperature": "21-29°C (70-85°F)",
+      "precautions": "Protect from cold, provide support",
+      "problems": [
+        {
+          "symptom": "Blossom drop",
+          "solution": "Temperature stress, maintain optimal conditions"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Lemon",
+      "image": "https://plus.unsplash.com/premium_photo-1675667408018-3b64dbc55db1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGxlbW9ufGVufDB8fDB8fHww",
+      "basics": "Citrus fruit tree valued for its sour, vitamin C-rich fruits.",
+      "growing": "Requires full sunlight, well-drained slightly acidic soil.",
+      "germination": "10-14 days",
+      "germinationSigns": "Tiny seedlings with glossy leaves",
+      "temperature": "21-32°C (70-90°F)",
+      "precautions": "Protect from frost, water deeply but not frequently",
+      "problems": [
+        {
+          "symptom": "Yellow leaves",
+          "solution": "Add nitrogen fertilizer, improve drainage"
+        },
+        {
+          "symptom": "Fruit drop",
+          "solution": "Maintain consistent watering and avoid stress"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Chilli",
+      "image": "https://plus.unsplash.com/premium_photo-1725899505152-6fda13e6a6f8?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8Y2hpbGxpfGVufDB8fDB8fHww",
+      "basics": "Spicy fruiting plant used in cuisines worldwide.",
+      "growing": "Needs warm climate, full sunlight, and loamy soil.",
+      "germination": "7-14 days",
+      "germinationSigns": "Seedlings with slender stems and pointed leaves",
+      "temperature": "20-30°C (68-86°F)",
+      "precautions": "Avoid overwatering, support plants with stakes if heavy with fruit",
+      "problems": [
+        {
+          "symptom": "Curling leaves",
+          "solution": "Check for aphids and treat with neem oil"
+        },
+        {
+          "symptom": "Poor fruiting",
+          "solution": "Ensure enough sunlight and phosphorus-rich fertilizer"
+        }
+      ]
+    }
+  ]
+}

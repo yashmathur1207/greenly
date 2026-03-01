@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Garden - Greenly</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#4CAF50",
+                        secondary: "#8BC34A",
+                        accent: "#FF9800",
+                        dark: "#2E7D32"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-primary text-white shadow-md">
+            <div class="container mx-auto px-4 py-4 relative flex items-center justify-between">
+                <!-- (Header content remains the same) -->
+                <div class="w-1/3 flex justify-start items-center space-x-4">
+                    {% if current_user.is_authenticated %}
+                        <span class="text-sm font-semibold">Welcome, {{ current_user.username }}!</span>
+                        <a href="{{ url_for('my_garden') }}" class="text-sm font-semibold hover:text-secondary transition-colors">My Garden</a>
+                        <a href="{{ url_for('logout') }}" class="text-sm font-semibold bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="text-sm font-semibold bg-white text-primary px-3 py-1 rounded hover:bg-gray-200 transition-colors">Login</a>
+                        <a href="{{ url_for('register') }}" class="text-sm font-semibold hover:text-secondary transition-colors">Register</a>
+                    {% endif %}
+                </div>
+                <div class="w-1/3 text-center">
+                    <a href="{{ url_for('index') }}"><h1 class="text-2xl font-bold">GREENLY</h1></a>
+                    <p class="text-sm opacity-90">Your guide to successful home gardening</p>
+                </div>
+                <div class="w-1/3 flex justify-end items-center space-x-4">
+                    <div id="google_translate_element"></div>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 container mx-auto px-4 py-6">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-gray-800">My Garden</h1>
+                <a href="{{ url_for('index') }}" class="text-primary hover:underline font-semibold">
+                    &larr; Back to Plant Catalog
+                </a>
+            </div>
+
+            {% if my_plants %}
+                <div id="my-garden-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for plant in my_plants %}
+                        <!-- Give each card a unique ID -->
+                        <div id="my-plant-{{ plant.my_plant_id }}" class="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
+                            <a href="{{ url_for('plant_journal', my_plant_id=plant.my_plant_id) }}" class="block relative group">
+                                <img src="{{ plant.static_image }}" alt="{{ plant.static_name }}" class="w-full h-48 object-cover transition-transform transform group-hover:scale-105">
+                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+                                    <span class="text-white opacity-0 group-hover:opacity-100 font-bold text-lg"><i class="fas fa-book-open mr-2"></i>Open Journal</span>
+                                </div>
+                            </a>
+                            <div class="p-4 flex-grow flex flex-col justify-between z-10 bg-white">
+                                <div>
+                                    <h3 class="font-semibold text-lg text-gray-800">{{ plant.nickname }}</h3>
+                                    <p class="text-xs text-primary font-bold uppercase tracking-wide mb-2">{{ plant.static_name }}</p>
+                                </div>
+                                <!-- NEW: Remove button -->
+                                <button data-plant-id="{{ plant.my_plant_id }}" class="remove-btn mt-4 w-full border border-red-500 text-red-500 py-2 rounded-lg hover:bg-red-500 hover:text-white transition-colors text-sm font-semibold">
+                                    <i class="fas fa-trash-alt mr-2"></i>Remove
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-16">
+                    <i class="fas fa-leaf text-6xl text-gray-300 mb-4"></i>
+                    <h2 class="text-2xl font-semibold text-gray-700">Your garden is empty.</h2>
+                    <p class="text-gray-500 mt-2">Explore the plant catalog and add some plants to your garden!</p>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+
+    <!-- (Google Translate Scripts remain the same) -->
+    
+    <!-- NEW: JavaScript for handling the remove action -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const removeButtons = document.querySelectorAll('.remove-btn');
+            
+            removeButtons.forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    const plantId = event.target.dataset.plantId;
+                    const card = document.getElementById(`my-plant-${plantId}`);
+
+                    if (!confirm('Are you sure you want to remove this plant from your garden?')) {
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/remove-from-garden', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ my_plant_id: plantId })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.status === 'success') {
+                            // Animate and remove the card from the page
+                            card.style.transition = 'opacity 0.5s ease';
+                            card.style.opacity = '0';
+                            setTimeout(() => {
+                                card.remove();
+                                // Check if the garden is now empty
+                                const grid = document.getElementById('my-garden-grid');
+                                if (grid.children.length === 0) {
+                                    window.location.reload(); // Reload to show the "empty garden" message
+                                }
+                            }, 500);
+                        } else {
+                            alert(result.message || 'An error occurred.');
+                        }
+                    } catch (error) {
+                        console.error('Failed to remove plant:', error);
+                        alert('Could not remove plant. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
